@@ -1,0 +1,21 @@
+name: Proof or specification issue
+description: Report an incorrect theorem, missing assumption, or proof problem
+title: "fix: "
+labels: [correctness]
+body:
+  - type: textarea
+    id: declaration
+    attributes:
+      label: Declaration and issue
+      description: Name the declaration and explain the suspected problem.
+    validations:
+      required: true
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal Lean example
+      render: lean
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed correction or missing assumption

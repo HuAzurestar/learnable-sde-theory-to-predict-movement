@@ -1,0 +1,12 @@
+.lake/
+lake-packages/
+
+*.log
+*.tmp
+*.bak
+*~
+
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

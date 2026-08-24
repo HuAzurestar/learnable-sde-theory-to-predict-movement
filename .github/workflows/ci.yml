@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+          lint: false
+      - name: Audit theorem axioms
+        run: lake env lean ESeries/CheckAxioms.lean
+      - name: Public release scan
+        run: python3 scripts/check_public_release.py
