@@ -73,3 +73,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for proof and commit requirements and
 yet. Until the rights holder adds a `LICENSE` file, the source is available for
 inspection but no permission to copy, modify, or redistribute it is implied.
 See [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
+
+The purpose, verification scope, triggers, and release assets of GitHub Actions
+are documented in [CI_CD.md](CI_CD.md).
