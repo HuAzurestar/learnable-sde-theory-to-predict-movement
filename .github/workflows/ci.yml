@@ -7,12 +7,32 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
-  build:
+  policy:
+    name: policy
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate PR traceability
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BRANCH: ${{ github.head_ref }}
+        run: python3 scripts/check_pr_title.py "$PR_TITLE" "$PR_BRANCH"
+      - name: Public release scan
+        run: python3 scripts/check_public_release.py
+  lean:
+    name: lean / build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: leanprover/lean-action@v1
@@ -24,3 +44,15 @@ jobs:
         run: lake env lean ESeries/CheckAxioms.lean
       - name: Public release scan
         run: python3 scripts/check_public_release.py
+  required:
+    name: ci / required
+    if: ${{ always() }}
+    needs: [policy, lean]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require successful gates
+        env:
+          POLICY: ${{ needs.policy.result }}
+          LEAN: ${{ needs.lean.result }}
+        run: test "$POLICY" = success && test "$LEAN" = success

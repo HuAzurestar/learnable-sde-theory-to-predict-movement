@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Proof contribution policy
+    url: https://github.com/HuAzurestar/learnable-sde-theory-to-predict-movement/blob/main/CONTRIBUTING.md
+    about: Read the issue, branch, proof-audit, and public-artifact requirements.
