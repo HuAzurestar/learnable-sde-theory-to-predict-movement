@@ -16,11 +16,17 @@ permissions:
 
 jobs:
   policy:
-    name: policy
+    name: policy / traceability and public boundary
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+      - name: Explain policy validation
+        run: |
+          {
+            echo "## Policy gate"
+            echo "Validates PR traceability and rejects non-public artifacts or identifiers."
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Validate PR traceability
         if: github.event_name == 'pull_request'
         env:
@@ -30,11 +36,17 @@ jobs:
       - name: Public release scan
         run: python3 scripts/check_public_release.py
   lean:
-    name: lean / build
+    name: lean / pinned build and proof audit
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+      - name: Explain Lean validation
+        run: |
+          {
+            echo "## Lean gate"
+            echo "Builds with the pinned toolchain, then rejects proof placeholders and unexpected theorem axioms."
+          } >> "$GITHUB_STEP_SUMMARY"
       - uses: leanprover/lean-action@v1
         with:
           build: true
@@ -51,6 +63,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Explain required-check result
+        run: |
+          {
+            echo "## Required gate"
+            echo "Passes only when the policy and pinned Lean proof-audit gates succeed."
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Require successful gates
         env:
           POLICY: ${{ needs.policy.result }}

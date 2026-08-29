@@ -17,8 +17,8 @@ has `contents: write`; a non-tag manual run cannot publish an asset.
 
 | Job shown in GitHub | What it verifies | Why it exists |
 | --- | --- | --- |
-| `policy` | On pull requests, checks the traceable title/branch convention; on every trigger, runs the public-release scan. | Preserves review traceability and prevents material outside the public boundary from entering the build. |
-| `lean / build` | Builds the package through the pinned Lean/Lake setup, then runs `scripts/audit_proofs.py`. The audit rejects `sorry`, `admit`, custom `axiom`, and `opaque` declarations and checks the designated theorem dependency reports. | Ensures the formalization compiles and that its stated proof and axiom boundary is mechanically enforced. |
+| `policy / traceability and public boundary` | On pull requests, checks the traceable title/branch convention; on every trigger, runs the public-release scan. | Preserves review traceability and prevents material outside the public boundary from entering the build. |
+| `lean / pinned build and proof audit` | Builds the package through the pinned Lean/Lake setup, then runs `scripts/audit_proofs.py`. The audit rejects `sorry`, `admit`, custom `axiom`, and `opaque` declarations and checks the designated theorem dependency reports. | Ensures the formalization compiles and that its stated proof and axiom boundary is mechanically enforced. |
 | `ci / required` | Runs even after an upstream failure and passes only if both `policy` and `lean` finish successfully. | Supplies branch protection with a single, readable required result. |
 
 The proof audit permits only the standard logical assumptions specified by the
