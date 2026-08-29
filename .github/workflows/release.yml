@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: release / build and audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: leanprover/lean-action@v1
+        with:
+          build: true
+          test: false
+          lint: false
+      - name: Reject placeholders and audit theorem axioms
+        run: python3 scripts/audit_proofs.py --report dist/axiom-audit.txt
+      - name: Validate public release policy
+        run: python3 scripts/check_public_release.py
+      - name: Package pinned formalization source
+        run: |
+          tag="${GITHUB_REF_NAME//\//-}"
+          tar -czf "dist/eseries-${tag}-source.tar.gz" ESeries ESeries.lean lakefile.toml lake-manifest.json lean-toolchain README.md FORMALIZATION_SCOPE.md scripts/audit_proofs.py
+          (cd dist && sha256sum * > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-release-${{ github.sha }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+  publish:
+    name: release / publish
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: lean-release-${{ github.sha }}
+          path: dist
+      - name: Publish immutable tag assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes dist/*
