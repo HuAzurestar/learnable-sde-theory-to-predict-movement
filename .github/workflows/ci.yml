@@ -41,7 +41,7 @@ jobs:
           test: false
           lint: false
       - name: Audit theorem axioms
-        run: lake env lean ESeries/CheckAxioms.lean
+        run: python3 scripts/audit_proofs.py
       - name: Public release scan
         run: python3 scripts/check_public_release.py
   required:
