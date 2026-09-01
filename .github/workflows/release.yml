@@ -33,7 +33,7 @@ jobs:
           tag="${GITHUB_REF_NAME//\//-}"
           tar -czf "dist/eseries-${tag}-source.tar.gz" ESeries ESeries.lean lakefile.toml lake-manifest.json lean-toolchain README.md FORMALIZATION_SCOPE.md scripts/audit_proofs.py
           (cd dist && sha256sum * > SHA256SUMS)
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: lean-release-${{ github.sha }}
           path: dist/*
